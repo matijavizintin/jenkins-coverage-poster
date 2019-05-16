@@ -10,7 +10,7 @@ def Double getCoverageFromReport(String xmlPath) {
   // can't use String.replaceAll() with groups: https://issues.jenkins-ci.org/browse/JENKINS-26481
   withEnv(["REPORT_PATH=${xmlPath}"]) {
     final coverage = sh(returnStdout: true, script: '''#!/bin/bash -xe
-      tail -n 1 ${REPORT_PATH} |  | awk \'{x=$4}END{print x}\' |  | sed \'$ s/.$//\'
+      tail -n 1 ${REPORT_PATH} | awk \'{x=$4}END{print x}\' | sed \'$ s/.$//\'
     ''')
 
     if(coverage == "") {
