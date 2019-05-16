@@ -1,26 +1,16 @@
 #!/usr/bin/env groovy
 package com.spotify.jenkinsfile
 
-def Double getCoverageFromJacoco(String xmlPath) {
+def Double getCoverageFromReport(String xmlPath) {
   if(!fileExists(xmlPath)) {
-    echo "[WARNING] Jacoco coverage report not found at ${xmlPath}"
+    echo "[WARNING] Coverage report not found at ${xmlPath}"
     return null
   }
 
   // can't use String.replaceAll() with groups: https://issues.jenkins-ci.org/browse/JENKINS-26481
-  withEnv(["XML_PATH=${xmlPath}"]) {
+  withEnv(["REPORT_PATH=${xmlPath}"]) {
     final coverage = sh(returnStdout: true, script: '''#!/bin/bash -xe
-      cat ${XML_PATH} | python -c 'import sys
-import xml.etree.ElementTree as ET
-
-tree = ET.parse(sys.stdin)
-root = tree.getroot()
-for counter in root.findall("counter"):
-    if counter.attrib["type"] == "INSTRUCTION":
-        missed = float(counter.attrib["missed"])
-        covered = float(counter.attrib["covered"])
-        coverage = covered / (missed + covered)
-        print "%.2f" % (coverage * 100)\'
+      tail -n 1 ${REPORT_PATH} |  | awk \'{x=$4}END{print x}\' |  | sed \'$ s/.$//\'
     ''')
 
     if(coverage == "") {
@@ -71,7 +61,7 @@ def Double getCoverageDelta() {
 }
 
 def Double getCoverage(String ref) {
-  withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: 'github-user-token',
+  withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: 'github-credentials',
                     usernameVariable: 'NOT_USED', passwordVariable: 'TOKEN']]) {
 
     final coverage = sh(returnStdout: true, script: """#!/bin/bash -xe
@@ -110,7 +100,7 @@ for status in content[\"statuses\"]:
 }
 
 def postCommitStatus(String state, String context, String description) {
-  withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: 'github-user-token',
+  withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: 'github-credentials',
                     usernameVariable: 'NOT_USED', passwordVariable: 'TOKEN']]) {
 
     // yay, escaping! https://gist.github.com/Faheetah/e11bd0315c34ed32e681616e41279ef4
