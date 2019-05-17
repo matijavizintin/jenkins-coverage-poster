@@ -75,7 +75,7 @@ def Double getCoverage(String ref) {
         COMMIT_HASH=\$(git rev-parse HEAD)
       else
         MASTER_HEAD_COMMIT_JSON=\$(curl "https://\${GITHUB_API_URL}/repos/\${ORG}/\${REPO}/commits/master?\${TOKEN_PARAM}")
-        COMMIT_HASH=\$(echo \$MASTER_HEAD_COMMIT | python -c 'import sys, json; content = json.load(sys.stdin); print content[\"sha\"]')
+        COMMIT_HASH=\$(echo \$MASTER_HEAD_COMMIT_JSON | python -c 'import sys, json; content = json.load(sys.stdin); print content[\"sha\"]')
       fi
 
       COMMIT_STATUS_URL=\$(echo "https://\${GITHUB_API_URL}/repos/\${ORG}/\${REPO}/commits/\${COMMIT_HASH}/status")
