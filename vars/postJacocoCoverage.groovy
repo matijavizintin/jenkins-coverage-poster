@@ -10,6 +10,6 @@ def call(Map args) {
   final Double coverage = lib.getCoverageFromReport(reportPath)
   lib.postCoverage(coverage, coverageThreshold)
 
-  final Double coverageDelta = lib.getCoverageDelta()
-  lib.postCoverageDelta(coverageDelta, coverageDeltaThreshold)
+//  final Double coverageDelta = lib.getCoverageDelta()
+//  lib.postCoverageDelta(coverageDelta, coverageDeltaThreshold)
 }
