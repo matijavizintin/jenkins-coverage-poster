@@ -7,15 +7,11 @@ def Double getCoverageFromReport(String xmlPath) {
     return null
   }
 
-  echo "Coverage for ${xmlPath}"
-
   // can't use String.replaceAll() with groups: https://issues.jenkins-ci.org/browse/JENKINS-26481
   withEnv(["REPORT_PATH=${xmlPath}"]) {
     final coverage = sh(returnStdout: true, script: '''#!/bin/bash -xe
       tail -n 1 ${REPORT_PATH} | awk \'{x=$4}END{print x}\' | sed \'$ s/.$//\'
     ''')
-
-    echo "Coverage value: ${coverage}"
 
     if(coverage == "") {
       echo "[WARNING] Unable to parse coverage report at ${xmlPath}"
@@ -77,7 +73,7 @@ def Double getCoverage(String ref) {
       if [[ ${ref} == HEAD ]]; then
         COMMIT_HASH=\$(git rev-parse HEAD)
       else
-        COMMIT_HASH=\$(git ls-remote git@\${GITHUB_HOST}:\${ORG}/\${REPO}.git "${ref}" | cut -f1)
+        COMMIT_HASH=\$(git ls-remote https://\${GITHUB_HOST}/\${ORG}/\${REPO}.git "${ref}" | cut -f1)
       fi
 
       COMMIT_STATUS_URL=\$(echo "https://\${GITHUB_API_URL}/repos/\${ORG}/\${REPO}/commits/\${COMMIT_HASH}/status")
