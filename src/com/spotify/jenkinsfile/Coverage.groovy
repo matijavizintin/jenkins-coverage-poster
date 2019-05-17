@@ -69,15 +69,16 @@ def Double getCoverage(String ref) {
       ORG_REPO_BRANCH_ARRAY=(\${JOB_NAME//// })
       ORG=\${ORG_REPO_BRANCH_ARRAY[0]}
       REPO=\${ORG_REPO_BRANCH_ARRAY[1]}
+      TOKEN_PARAM="access_token=\${TOKEN}"
 
       if [[ ${ref} == HEAD ]]; then
         COMMIT_HASH=\$(git rev-parse HEAD)
       else
-        COMMIT_HASH=\$(git ls-remote https://\${GITHUB_HOST}/\${ORG}/\${REPO}.git "${ref}" | cut -f1)
+        MASTER_HEAD_COMMIT_JSON=\$(curl "https://\${GITHUB_API_URL}/repos/\${ORG}/\${REPO}/commits/master?\${TOKEN_PARAM}")
+        COMMIT_HASH=\$(echo \$MASTER_HEAD_COMMIT | python -c 'import sys, json; content = json.load(sys.stdin); print content[\"sha\"]')
       fi
 
       COMMIT_STATUS_URL=\$(echo "https://\${GITHUB_API_URL}/repos/\${ORG}/\${REPO}/commits/\${COMMIT_HASH}/status")
-      TOKEN_PARAM="access_token=\$TOKEN"
       COMMIT_JSON=\$(curl "\${COMMIT_STATUS_URL}?\${TOKEN_PARAM}")
 
       echo \$COMMIT_JSON | python -c 'import sys, json
