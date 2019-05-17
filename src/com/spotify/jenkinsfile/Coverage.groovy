@@ -7,18 +7,22 @@ def Double getCoverageFromReport(String xmlPath) {
     return null
   }
 
+  echo "Coverage for ${xmlPath}"
+
   // can't use String.replaceAll() with groups: https://issues.jenkins-ci.org/browse/JENKINS-26481
   withEnv(["REPORT_PATH=${xmlPath}"]) {
     final coverage = sh(returnStdout: true, script: '''#!/bin/bash -xe
-      tail -n 1 ${REPORT_PATH} | awk \'{x=$4}END{print x}\' | sed \'$ s/.$//\' | echo
+      tail -n 1 ${REPORT_PATH} | awk \'{x=$4}END{print x}\' | sed \'$ s/.$//\'
     ''')
+
+    echo "Coverage value: ${coverage}"
 
     if(coverage == "") {
       echo "[WARNING] Unable to parse Jacoco coverage report at ${xmlPath}"
       return null
     }
 
-    return coverage as Double
+    return Double.parseDouble(coverage)
   }
 }
 
@@ -34,7 +38,7 @@ def postCoverage(Double coverage, Double threshold) {
   postCommitStatus(state, context, description)
 }
 
-@NonCPS
+//@NonCPS
 def postCoverageDelta(Double coverageDelta, Double threshold) {
   if(threshold == null) {
     echo "[WARNING] No delta threshold specified. Nothing will be posted"
