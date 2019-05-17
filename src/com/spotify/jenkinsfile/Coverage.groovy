@@ -65,7 +65,7 @@ def Double getCoverageDelta() {
 }
 
 def Double getCoverage(String ref) {
-  withCredentials([string(credentialsId: 'github-credentials', variable: 'TOKEN')]) {
+  withCredentials([string(credentialsId: 'z1_codecov_token', variable: 'TOKEN')]) {
 
     final coverage = sh(returnStdout: true, script: """#!/bin/bash -xe
       GITHUB_HOST=\$(git config remote.origin.url | cut -d/ -f3)
@@ -103,7 +103,7 @@ for status in content[\"statuses\"]:
 }
 
 def postCommitStatus(String state, String context, String description) {
-  withCredentials([string(credentialsId: 'github-credentials', variable: 'TOKEN')]) {
+  withCredentials([string(credentialsId: 'z1_codecov_token', variable: 'TOKEN')]) {
 
     // yay, escaping! https://gist.github.com/Faheetah/e11bd0315c34ed32e681616e41279ef4
     final script = """#!/bin/bash -xe
