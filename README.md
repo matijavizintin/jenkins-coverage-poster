@@ -4,22 +4,19 @@ A Jenkins 2.0 Pipeline library for automatically posting code coverage results t
 
 Currently supports:
  * input
-   * jacoco xml
- * output
-   * github.com
-   * github enterprise
+   * coverage.py
 
 ## Example usage
 In your Jenkinsfile:
 ```
-@Library('github.com/spotify/jenkins-coverage-poster@1.0') _
+@Library('github.com/matijavizintin/jenkins-coverage-poster@1.0') _
 
 stage("Run tests") {
   sh "mvn test"
 }
 
 stage("Post coverage") {
-  postJacocoCoverage(threshold: 75)
+  postCoverage(threshold: 75, deltaThreshold: 10, reportPath: "path_to/coverage.out")
 }
 ```
 
@@ -32,8 +29,8 @@ stage("Post coverage") {
  * `deltaThreshold` (optional): your code coverage must have changed by at least this much to get a passing score
    * if not specified, coverage delta will not be computed and pull request status will not be affected
    * for example, setting `deltaThreshold: -1.0` will cause the pull request to be marked red if your changes result in a drop of more than 1% coverage (as compared to the coverage in the master branch)
- * `xmlPath` (optional): the location of the jacoco coverage xml file
-   * defaults to `target/site/jacoco/jacoco.xml`
+ * `reportPath` (optional): the location of the coverage text file
+   * defaults to `coverage.out`
 
 ## What is "coverage"?
 This library uses total *instruction* coverage for all code coverage calculations. Note that this is different from line coverage and branch coverage.
@@ -42,9 +39,8 @@ This library uses total *instruction* coverage for all code coverage calculation
  * jenkins 2.0+
  * bash 4.0+
  * python 2.6+
- * maven, sbt, or something else that can generate jacoco reports
  
-In addition, in Jenkins there must be a defined Credential called `github-user-token`, containing as password a valid GitHub api token. The Credential username can be anything, as it is not used. The token's permissions must allow read access to repositories and posting comments to pull requests at minimum.
+In addition, in Jenkins there must be a defined Credential of type secret text called `github-credentials`, containing a valid GitHub api token. The token's permissions must allow read access to repositories and posting comments to pull requests at minimum.
 
 ## Code of conduct
 This project adheres to the [Open Code of Conduct][code-of-conduct]. By participating, you are expected to honor this code.

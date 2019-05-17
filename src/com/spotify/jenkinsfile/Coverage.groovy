@@ -18,7 +18,7 @@ def Double getCoverageFromReport(String xmlPath) {
     echo "Coverage value: ${coverage}"
 
     if(coverage == "") {
-      echo "[WARNING] Unable to parse Jacoco coverage report at ${xmlPath}"
+      echo "[WARNING] Unable to parse coverage report at ${xmlPath}"
       return null
     }
 
@@ -38,7 +38,7 @@ def postCoverage(Double coverage, Double threshold) {
   postCommitStatus(state, context, description)
 }
 
-//@NonCPS
+@NonCPS
 def postCoverageDelta(Double coverageDelta, Double threshold) {
   if(threshold == null) {
     echo "[WARNING] No delta threshold specified. Nothing will be posted"
